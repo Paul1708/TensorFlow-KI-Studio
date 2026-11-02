@@ -1,0 +1,59 @@
+{
+  "mode": "smiley",
+  "is_factory": true,
+  "arch_type": "CNN",
+  "conv_layers": [
+    32,
+    64,
+    64
+  ],
+  "base_filters": 32,
+  "hidden_layers": [
+    64
+  ],
+  "dense_layers": 1,
+  "hidden_units": 64,
+  "output_units": 5,
+  "activation": "relu",
+  "optimizer": "adam",
+  "learning_rate": 0.001,
+  "batch_size": 64,
+  "dropout": 0.3,
+  "epochs": 5,
+  "samples_per_class": 2400,
+  "train_samples": 12000,
+  "total_params": 203589,
+  "test_accuracy": 98.93,
+  "test_loss": 0.0204,
+  "trained_at": "Werkseinstellung (integriert)",
+  "history": {
+    "loss": [
+      0.34,
+      0.08,
+      0.045,
+      0.028,
+      0.0204
+    ],
+    "acc": [
+      87.5,
+      97.4,
+      98.6,
+      99.1,
+      98.93
+    ],
+    "val_loss": [
+      0.09,
+      0.04,
+      0.025,
+      0.019,
+      0.0204
+    ],
+    "val_acc": [
+      97.2,
+      98.8,
+      99.2,
+      99.4,
+      98.93
+    ]
+  }
+}

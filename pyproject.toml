@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=69.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tensorflow-ki-studio"
+version = "1.0.0"
+description = "Interactive real-time neural network visualizer and offline training lab built with TensorFlow and Keras."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [
+  { name = "Paul Brinkmann" },
+]
+keywords = [
+  "tensorflow",
+  "keras",
+  "neural-networks",
+  "visualization",
+  "mnist",
+  "deep-learning",
+  "education",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Education",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+  "tensorflow>=2.16.0",
+  "numpy>=1.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+]
+
+[project.scripts]
+ki-studio = "ki_studio.cli.app:main"
+ki-studio-train-digits = "ki_studio.cli.train_digits:main"
+ki-studio-train-smiley = "ki_studio.cli.train_smiley:main"
+ki-studio-digits = "ki_studio.cli.predict_digits:main"
+ki-studio-smiley = "ki_studio.cli.predict_smiley:main"
+ki-studio-test = "ki_studio.cli.quick_test:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ki_studio = [
+  "web/*.html",
+  "web/static/css/*.css",
+  "web/static/js/*.js",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="de" style="background:#060a14;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090e1a">
+<title>TensorFlow KI-Studio – Live Gehirn-Visualisierung</title>
+<link rel="icon" type="image/png" sizes="256x256" href="/icon-256.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/icon-256.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+  <!-- Instant Dark Loading Screen while TensorFlow C++ Core & Models initialize -->
+  <div id="bootOverlay" class="boot-overlay">
+    <div class="boot-card">
+      <div class="boot-icon-ring">🧠</div>
+      <div class="boot-title">TensorFlow KI-Studio</div>
+      <div id="bootStepText" class="boot-step">Starte lokale KI-Engine & lade Neuronale Netze...</div>
+      <div class="boot-bar-track">
+        <div id="bootBarFill" class="boot-bar-fill"></div>
+      </div>
+      <div class="boot-meta-row">
+        <span id="bootSubHint">100 % Offline • Keine versteckten Systemdateien</span>
+        <span id="bootPctText" style="font-family: Consolas, monospace; color: #e2e8f0; font-weight: 700;">18 %</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Navigation Header -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">🧠</div>
+      <div>
+        <div class="brand-title">TensorFlow KI-Studio</div>
+        <div class="brand-sub">
+          <span class="status-dot"></span>
+          <span id="engineStatusText">Verbinde mit TensorFlow-Gehirn...</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav-pills">
+      <button class="nav-btn active" data-view="dashboard" onclick="switchView('dashboard')">🏠 Übersicht</button>
+      <button class="nav-btn" data-view="zahlen" onclick="switchView('zahlen')">🔢 Zahlen-KI (0–9)</button>
+      <button class="nav-btn" data-view="smiley" onclick="switchView('smiley')">😊 Smiley-Glücks-KI</button>
+      <button class="nav-btn" data-view="training" onclick="switchView('training')">🧪 KI-Training & Labor</button>
+    </nav>
+  </header>
+
+  <!-- VIEW 1: DASHBOARD -->
+  <main id="view-dashboard" class="view-container">
+    <div class="hero-banner">
+      <div>
+        <h1>Schau deinem Neuronalen Netz beim Denken zu!</h1>
+        <p>
+          Zeichne live mit der Maus oder lade eigene Bilder hoch – beobachte in Echtzeit jeden einzelnen
+          Filter- und Neuronen-Knoten, die leuchtenden Synapsen-Ströme und wie über die Softmax-Formel
+          Schritt für Schritt die Wahrscheinlichkeit berechnet wird.
+        </p>
+      </div>
+      <button class="primary-btn btn-blue" onclick="switchView('zahlen')" style="padding: 13px 22px; font-size: 14px;">
+        🚀 Direkt loslegen
+      </button>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card dash-card">
+        <div>
+          <div class="dash-icon" style="background: rgba(37, 99, 235, 0.2); color: #60a5fa;">🔢</div>
+          <h3>Zahlen-Erkenner (0 bis 9)</h3>
+          <p id="dashZahlenDesc">
+            Neuronales Netz zur Ziffernerkennung. Zeichne Ziffern, radiere per Rechtsklick
+            und sieh live, welche Denk-Neuronen für oder gegen eine Ziffer stimmen.
+          </p>
+          <div class="badge-row" id="dashZahlenBadges">
+            <span class="pill-badge">32 + 64 Bildfilter</span>
+            <span class="pill-badge">64 ReLU-Neuronen</span>
+            <span class="pill-badge">10 Ausgabeknoten</span>
+          </div>
+        </div>
+        <button class="primary-btn btn-blue" onclick="switchView('zahlen')">Zahlen-KI & Gehirn öffnen →</button>
+      </div>
+
+      <div class="card dash-card">
+        <div>
+          <div class="dash-icon" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">😊</div>
+          <h3>Smiley-Glücks-Erkenner (0–100 %)</h3>
+          <p id="dashSmileyDesc">
+            Zeichne einen Smiley (mit oder ohne Kopfkreis) und beobachte live während du den Mundwinkel ziehst,
+            wie die Neuronen umschalten und das Glücks-Barometer von 0 % bis 100 % wandert!
+          </p>
+          <div class="badge-row" id="dashSmileyBadges">
+            <span class="pill-badge">160 Gesichts-Filter</span>
+            <span class="pill-badge">Live Glücks-Barometer</span>
+            <span class="pill-badge">5 Gefühls-Stufen</span>
+          </div>
+        </div>
+        <button class="primary-btn btn-emerald" onclick="switchView('smiley')">Smiley-KI & Gehirn öffnen →</button>
+      </div>
+
+      <div class="card dash-card">
+        <div>
+          <div class="dash-icon" style="background: rgba(139, 92, 246, 0.2); color: #c084fc;">🧪</div>
+          <h3>KI-Training & Parameter-Labor</h3>
+          <p>
+            Baue dein eigenes Gehirn! Passe Filter-Schichten, Neuronen-Anzahl, Aktivierung, Lernrate, Optimierer
+            und Datenmenge frei an – die gesamte Gehirn-Visualisierung passt sich sofort dynamisch an!
+          </p>
+          <div class="badge-row">
+            <span class="pill-badge" id="dashZahlenStatus">Zahlen-Netz: Prüfe...</span>
+            <span class="pill-badge" id="dashSmileyStatus">Smiley-Netz: Prüfe...</span>
+          </div>
+        </div>
+        <button class="primary-btn btn-violet" onclick="switchView('training')">Training & Labor öffnen →</button>
+      </div>
+    </div>
+
+    <!-- Transparent Data Footprint Bar on Dashboard -->
+    <div class="data-clean-card">
+      <div class="data-clean-info">
+        <div class="data-clean-header">
+          <span>🛡️ Saubere Self-Contained App (Keine versteckten Dateien)</span>
+          <span id="dashDataPill" class="data-status-pill">Prüfe Speicher...</span>
+        </div>
+        <div id="dashDataDesc" class="data-clean-desc">
+          Keine versteckten Dateien in System- oder Temp-Ordnern! Schnellstart-Engine und eigene Trainings aus dem KI-Labor liegen gebündelt im einzigen sichtbaren Ordner <b>KI_Studio_Daten</b> direkt neben der EXE.
+        </div>
+      </div>
+      <div class="data-clean-actions">
+        <button id="btnDashOpenData" class="ghost-btn" onclick="openDataLocation()">📂 Speicherort zeigen</button>
+        <button id="btnDashResetData" class="primary-btn btn-rose sm-btn" onclick="resetUserData()" disabled>🗑️ Eigene Daten löschen</button>
+        <button id="btnDashCleanupAll" class="ghost-btn" onclick="cleanupAllAndExit()" disabled title="Schließt die App und entfernt den gesamten Ordner KI_Studio_Daten restlos">🧹 Schließen &amp; Datenordner entfernen</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- VIEW 2 & 3: INTERACTIVE BRAIN STUDIO (ZAHLEN & SMILEY) -->
+  <main id="view-studio" class="view-container hidden">
+    <div class="studio-layout">
+
+      <!-- Left Column: Drawing Pad & AI Eye -->
+      <div class="left-column">
+        <div class="card">
+          <div class="tool-header">
+            <h2 id="padTitle">Zeichenfeld (Zahlen 0–9)</h2>
+            <div class="tool-toggle">
+              <button id="btnBrush" class="tool-chip active" onclick="setDrawTool('brush')">✏️ Stift</button>
+              <button id="btnEraser" class="tool-chip" onclick="setDrawTool('eraser')">🧽 Radierer</button>
+            </div>
+          </div>
+
+          <div class="canvas-frame">
+            <canvas id="drawCanvas" width="280" height="280"></canvas>
+          </div>
+
+          <div class="btn-grid-2">
+            <button class="primary-btn btn-violet sm-btn" id="btnRandom" onclick="loadRandomSample()">🎲 Zufalls-Zahl</button>
+            <button class="primary-btn btn-blue sm-btn" onclick="document.getElementById('fileInput').click()">📂 Bild öffnen</button>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
+
+          <div class="btn-grid-3">
+            <button class="primary-btn btn-emerald sm-btn" onclick="triggerAnalyzeNow()">🔍 Prüfen</button>
+            <button class="primary-btn btn-rose sm-btn" onclick="clearCanvas()">🗑️ Leeren</button>
+            <button class="primary-btn btn-slate sm-btn" onclick="saveCanvasPNG()">💾 PNG</button>
+          </div>
+        </div>
+
+        <!-- AI Camera Preview + Top Conv2D Filters -->
+        <div class="card">
+          <div class="eye-section-title">
+            <span id="eyeBoxTitle">👁️ KI-Eingabe & aktivste Augen-Filter</span>
+            <span id="inputResLabel" style="font-family: Consolas, monospace;">28×28</span>
+          </div>
+          <div class="eye-row">
+            <img id="aiPreviewImg" class="ai-preview-img" alt="KI Vorschau" src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=">
+            <div id="topFiltersBox" class="fmap-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Prediction Banner + Live Neural Brain + Softmax Math -->
+      <div class="right-column">
+
+        <!-- Top Result & Happiness Barometer -->
+        <div class="card result-banner">
+          <div class="result-main">
+            <div id="resultBadge" class="result-big-badge">–</div>
+            <div>
+              <div id="resultTitle" class="result-label-title">Zeichne links ins Feld!</div>
+              <div id="resultSubtitle" class="result-sub">Das Gehirn aktualisiert alle Knoten live während du malst.</div>
+            </div>
+          </div>
+
+          <div id="happinessBox" class="happiness-meter-box hidden">
+            <div class="happiness-header">
+              <span>😢 Traurig (0 %)</span>
+              <span id="happinessValueText" style="color: #34d399;">Glücks-Level: –</span>
+              <span>😄 100 %</span>
+            </div>
+            <div class="happiness-track">
+              <div id="happinessFill" class="happiness-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIVE NEURAL NETWORK BRAIN VISUALIZATION -->
+        <div class="card brain-card">
+          <div class="brain-topbar">
+            <div class="brain-title-group">
+              <h3>🧠 Live Gehirn-Visualisierung <span id="brainModelTag" class="pill-badge">CNN</span></h3>
+              <p>Bewege die Maus über einzelne Knoten zum Inspizieren • Klicke rechts auf einen Ausgabeknoten, um seine Berechnung zu prüfen</p>
+            </div>
+            <div class="brain-legend">
+              <div class="legend-item"><span class="legend-line-pos"></span> Befürwortet (+ Punkte)</div>
+              <div class="legend-item"><span class="legend-line-neg"></span> Hemmt (– Punkte)</div>
+            </div>
+          </div>
+
+          <div class="arch-info-strip">
+            <span id="studioArchSummary">Aktives Gehirn wird gelesen...</span>
+            <button class="ghost-btn" style="padding: 3px 9px; font-size: 11px;" onclick="openLabForCurrentMode()">⚙️ Gehirn im Labor umbauen</button>
+          </div>
+
+          <div class="brain-canvas-wrap" id="brainWrap">
+            <canvas id="brainCanvas"></canvas>
+            <div id="nodeTooltip" class="node-tooltip hidden">
+              <div id="nodeTooltipHtml"></div>
+              <canvas id="tooltipMapCanvas" width="72" height="72" class="tooltip-map-canvas hidden"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIVE SOFTMAX PROBABILITY EXPLAINER -->
+        <div class="card">
+          <div class="math-header">
+            <h3 id="mathHeaderTitle">📐 Wie kommt die Wahrscheinlichkeit zustande? (Live-Rechnung)</h3>
+            <span id="focusResetPill" class="focus-pill" onclick="resetOutputFocus()">🎯 Fokus: Automatisch auf Gewinner</span>
+          </div>
+
+          <div class="steps-grid">
+            <!-- Step 1 -->
+            <div class="step-box">
+              <div class="step-num">Schritt 1 • Neuronen-Abstimmung</div>
+              <div class="step-title" id="step1Title">Denk-Neuronen vergeben Punkte</div>
+              <div class="step-desc">
+                Jedes aktive Neuron der letzten Denkschicht multipliziert seine Stärke mit dem gelernten Verbindungs-Gewicht (<code>Aktivierung × Gewicht</code>):
+              </div>
+              <div id="step1Chips" class="contrib-chips"></div>
+              <div id="step1Formula" class="formula-box">Noch keine aktiven Neuronen.</div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-box">
+              <div class="step-num">Schritt 2 • Softmax-Verstärker</div>
+              <div class="step-title">Roh-Punkte in positive Gewichte (e<sup>z</sup>)</div>
+              <div class="step-desc">
+                Da Wahrscheinlichkeiten nicht negativ sein dürfen, rechnet die Exponentialfunktion <code>exp(z − z<sub>max</sub>)</code> alle Roh-Punkte um und hebt den Favoriten stark hervor:
+              </div>
+              <div id="step2Formula" class="formula-box">Warte auf Eingabe...</div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-box">
+              <div class="step-num">Schritt 3 • Prozent-Anteil</div>
+              <div class="step-title">Teilen durch die Gesamtsumme = %</div>
+              <div class="step-desc">
+                Das Softmax-Gewicht des Knotens wird durch die Summe <em>aller</em> Kandidaten geteilt – so ergeben alle Ausgaben zusammen exakt 100 %:
+              </div>
+              <div id="step3Formula" class="formula-box">Warte auf Eingabe...</div>
+            </div>
+          </div>
+
+          <!-- Complete Candidate Comparison Table -->
+          <table class="prob-table">
+            <thead>
+              <tr>
+                <th>Kandidat (Klick = Fokus)</th>
+                <th>Neuronen-Summe + Grundwert (Bias)</th>
+                <th>Roh-Punkte (Logit z)</th>
+                <th>Softmax-Gewicht</th>
+                <th class="bar-cell">Wahrscheinlichkeit</th>
+                <th style="text-align:right;">Ergebnis</th>
+              </tr>
+            </thead>
+            <tbody id="probTableBody"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- VIEW 4: INTERACTIVE AI TRAINING & PARAMETER LAB -->
+  <main id="view-training" class="view-container hidden">
+    <div class="lab-layout">
+
+      <!-- Left Card: Architecture & Hyperparameter Configurator -->
+      <div class="card">
+        <h2 style="font-size: 18px; margin-bottom: 4px;">🧪 KI-Training & Architektur-Labor</h2>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 12px;">
+          Konfiguriere dein eigenes Neuronales Netz! Nach dem Training passt sich die Live-Gehirn-Visualisierung automatisch an deine neue Schicht- und Knoten-Struktur an.
+        </p>
+
+        <!-- 1. Select Target Network -->
+        <div class="lab-target-tabs">
+          <button id="labTabZahlen" class="lab-target-btn active" onclick="selectLabTarget('zahlen')">
+            <span class="lab-target-title">🔢 Zahlen-Netz (0–9)</span>
+            <span class="lab-target-sub" id="labSubZahlen">MNIST 28×28 • 10 Klassen</span>
+          </button>
+          <button id="labTabSmiley" class="lab-target-btn" onclick="selectLabTarget('smiley')">
+            <span class="lab-target-title">😊 Smiley-Glücks-Netz</span>
+            <span class="lab-target-sub" id="labSubSmiley">Freihand 48×48 • 5 Stufen</span>
+          </button>
+        </div>
+
+        <!-- Currently active saved model summary -->
+        <div class="active-brain-summary">
+          <div>
+            <div style="font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: #7dd3fc; font-weight: 800;">Aktuell geladenes Gehirn</div>
+            <div id="labLoadedBrainInfo" style="color: #e2e8f0; margin-top: 2px;">Lese aktives Modell...</div>
+          </div>
+          <button class="ghost-btn" style="padding: 5px 10px; font-size: 11px;" onclick="loadActiveModelIntoControls()">📥 Aktive Werte laden</button>
+        </div>
+
+        <!-- 2. Quick Experiment Presets -->
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 700;">⚡ Schnell-Vorlagen zum Experimentieren:</div>
+        <div class="preset-row">
+          <button class="preset-chip" onclick="applyLabPreset('standard')">⚖️ Empfohlener Standard</button>
+          <button class="preset-chip" onclick="applyLabPreset('mini')">⚡ Mini-Gehirn (Blitz)</button>
+          <button class="preset-chip" onclick="applyLabPreset('deep')">🧬 Tiefes Doppel-Denker-CNN</button>
+          <button class="preset-chip" onclick="applyLabPreset('mlp')">🕸️ Reines MLP (0 Filter)</button>
+          <button class="preset-chip" onclick="applyLabPreset('chaos')">🌪️ Zu hohe Lernrate (Test)</button>
+        </div>
+
+        <!-- 3A. Brain Architecture Parameters -->
+        <div class="param-section-title">🧠 1. Gehirn-Architektur (bestimmt Schichten & Knoten im Visualisierer)</div>
+        <div class="param-grid">
+          <div class="param-box">
+            <div class="param-label-row">
+              <span>Filter-Schichten (Conv2D)</span>
+              <span class="param-val-badge" id="lblConvLayers">2</span>
+            </div>
+            <select id="inpConvLayers" class="lab-select" onchange="onLabParamChange()">
+              <option value="0">0 – Kein CNN (Reines MLP / Pixel-Netz)</option>
+              <option value="1">1 Filter-Schicht (Einfache Kanten)</option>
+              <option value="2" selected>2 Filter-Schichten (Formen & Bögen)</option>
+              <option value="3">3 Filter-Schichten (Tiefe Muster)</option>
+            </select>
+            <div class="param-hint">Wie viele Lupen-Ebenen das Bild nacheinander nach Mustern abscannen.</div>
+          </div>
+
+          <div class="param-box" id="boxBaseFilters">
+            <div class="param-label-row">
+              <span>Augen-Filter (Basisgröße)</span>
+              <span class="param-val-badge" id="lblBaseFilters">32→64</span>
+            </div>
+            <select id="inpBaseFilters" class="lab-select" onchange="onLabParamChange()">
+              <option value="8">8 Filter (Mini: 8 → 16)</option>
+              <option value="16">16 Filter (Kompakt: 16 → 32)</option>
+              <option value="32" selected>32 Filter (Standard: 32 → 64)</option>
+              <option value="48">48 Filter (Groß: 48 → 96)</option>
+              <option value="64">64 Filter (Max: 64 → 128)</option>
+            </select>
+            <div class="param-hint">Mehr Filter erkennen feinere Details, brauchen aber mehr Rechenzeit.</div>
+          </div>
+
+          <div class="param-box">
+            <div class="param-label-row">
+              <span>Denkschichten (Hidden)</span>
+              <span class="param-val-badge" id="lblDenseLayers">1 Ebene</span>
+            </div>
+            <select id="inpDenseLayers" class="lab-select" onchange="onLabParamChange()">
+              <option value="1" selected>1 Denkschicht (Klassisch & direkt)</option>
+              <option value="2">2 Denkschichten (Tieferes Doppel-Gehirn)</option>
+            </select>
+            <div class="param-hint">Bei 2 Denkschichten siehst du zwei goldene Neuronen-Ebenen hintereinander!</div>
+          </div>
+
+          <div class="param-box">
+            <div class="param-label-row">
+              <span>Denk-Neuronen pro Schicht</span>
+              <span class="param-val-badge" id="lblHiddenUnits">64</span>
+            </div>
+            <select id="inpHiddenUnits" class="lab-select" onchange="onLabParamChange()">
+              <option value="16">16 Neuronen (Sehr übersichtlich)</option>
+              <option value="24">24 Neuronen (Leichtgewicht)</option>
+              <option value="32">32 Neuronen (Kompakt)</option>
+              <option value="48">48 Neuronen (Mittel)</option>
+              <option value="64" selected>64 Neuronen (Standard)</option>
+              <option value="96">96 Neuronen (Stark)</option>
+              <option value="128">128 Neuronen (Großes Gehirn)</option>
+            </select>
+            <div class="param-hint">Anzahl der einzelnen Knoten in jeder Denkschicht.</div>
+          </div>
+
+          <div class="param-box" style="grid-column: 1 / -1;">
+            <div class="param-label-row">
+              <span>Aktivierungsfunktion (Schaltlogik der Neuronen)</span>
+              <span class="param-val-badge" id="lblActivation">RELU</span>
+            </div>
+            <select id="inpActivation" class="lab-select" onchange="onLabParamChange()">
+              <option value="relu" selected>ReLU – Standard: Negative Reize = 0, positive feuern frei (schnell & präzise)</option>
+              <option value="elu">ELU – Weiche Kurve: Erlaubt auch sanfte negative Signale</option>
+              <option value="tanh">Tanh – Klassische Welle: Neuronen schwingen zwischen −1.0 und +1.0</option>
+              <option value="sigmoid">Sigmoid – Klassischer Schalter: Werte weich zwischen 0.0 und 1.0</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 3B. Learning & Training Hyperparameters -->
+        <div class="param-section-title">🎓 2. Trainings- & Lern-Parameter (steuert den Lernprozess)</div>
+        <div class="param-grid">
+          <div class="param-box">
+            <div class="param-label-row">
+              <span>Epochen (Durchläufe)</span>
+              <span class="param-val-badge" id="lblEpochs">4</span>
+            </div>
+            <input id="inpEpochs" type="range" min="1" max="15" step="1" value="4" class="lab-range" oninput="onLabParamChange()">
+            <div class="param-hint">Wie oft die KI das gesamte Trainings-Heft komplett durcharbeitet (1–15).</div>
+          </div>
+
+          <div class="param-box">
+            <div class="param-label-row">
+              <span>Dropout (Auswendiglern-Schutz)</span>
+              <span class="param-val-badge" id="lblDropout">30 %</span>
+            </div>
+            <input id="inpDropout" type="range" min="0" max="50" step="5" value="30" class="lab-range" oninput="onLabParamChange()">
+            <div class="param-hint">Schaltet beim Üben zufällig % der Leitungen ab, damit das Netz flexibel bleibt.</div>
+          </div>
+
+          <div class="param-box">
+            <div class="param-label-row">
+              <span>Lernrate (Schrittweite)</span>
+              <span class="param-val-badge" id="lblLR">0.001</span>
+            </div>
+            <select id="inpLR" class="lab-select" onchange="onLabParamChange()">
+              <option value="0.0003">0.0003 – Sehr vorsichtig & fein</option>
+              <option value="0.001" selected>0.001 – Optimaler Standard</option>
+              <option value="0.003">0.003 – Mutig & schnell</option>
+              <option value="0.01">0.01 – Sehr aggressiv</option>
+              <option value="0.05">0.05 – Viel zu hoch (Chaos-Experiment!)</option>
+            </select>
+            <div class="param-hint">Wie stark Gewichte nach Fehlern geändert werden. Zu hoch = Netz überschießt!</div>
+          </div>
+
+          <div class="param-box">
+            <div class="param-label-row">
+              <span>Optimierer ("Der Lehrer")</span>
+              <span class="param-val-badge" id="lblOptimizer">ADAM</span>
+            </div>
+            <select id="inpOptimizer" class="lab-select" onchange="onLabParamChange()">
+              <option value="adam" selected>Adam (Modern, mit Schwung & Auto-Anpassung)</option>
+              <option value="rmsprop">RMSprop (Gleitende Schrittanpassung)</option>
+              <option value="sgd">SGD (Klassischer Gradientenabstieg mit Momentum)</option>
+            </select>
+            <div class="param-hint">Der Algorithmus, der die Synapsen-Gewichte nach jedem Fehler korrigiert.</div>
+          </div>
+
+          <div class="param-box">
+            <div class="param-label-row">
+              <span>Batch-Größe (Bilder/Schritt)</span>
+              <span class="param-val-badge" id="lblBatchSize">64</span>
+            </div>
+            <select id="inpBatchSize" class="lab-select" onchange="onLabParamChange()">
+              <option value="16">16 Bilder (Häufige kleine Updates)</option>
+              <option value="32">32 Bilder (Fein)</option>
+              <option value="64" selected>64 Bilder (Ausgewogener Standard)</option>
+              <option value="128">128 Bilder (Schnelle Epochen)</option>
+              <option value="256">256 Bilder (Große Pakete)</option>
+            </select>
+            <div class="param-hint">Wie viele Bilder gleichzeitig angeschaut werden, bevor korrigiert wird.</div>
+          </div>
+
+          <div class="param-box">
+            <div class="param-label-row">
+              <span>Trainingsdaten-Menge</span>
+              <span class="param-val-badge" id="lblDataAmount">100 %</span>
+            </div>
+            <select id="inpDataAmount" class="lab-select" onchange="onLabParamChange()">
+              <!-- Populated dynamically for Zahlen vs Smiley -->
+            </select>
+            <div class="param-hint">Weniger Daten = Blitz-Training in Sekunden, mehr Daten = klügeres Netz!</div>
+          </div>
+        </div>
+
+        <!-- Live Architecture Blueprint Bar -->
+        <div class="blueprint-bar">
+          <div class="blueprint-title">
+            <span>📐 Live Bauplan für die Gehirn-Visualisierung:</span>
+            <span id="bpTotalNodes" style="color: #38bdf8;">170 Knoten</span>
+          </div>
+          <div id="blueprintChain" class="blueprint-chain"></div>
+        </div>
+
+        <div class="lab-controls">
+          <button id="btnStartCustomTrain" class="primary-btn btn-emerald" style="flex: 1; justify-content: center; padding: 12px 16px;" onclick="startCustomTraining()">
+            🚀 Gehirn mit diesen Parametern jetzt trainieren
+          </button>
+          <button class="primary-btn btn-rose" onclick="stopTraining()">⏹️ Stopp</button>
+        </div>
+      </div>
+
+      <!-- Right Card: Live Epoch Chart, Progress & Console Output -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+          <div>
+            <h2 style="font-size: 17px;">📈 Live Trainings-Monitor & Lernkurve</h2>
+            <p style="font-size: 12px; color: var(--text-muted);">Verfolge Trefferquote (%) und Fehlerwert (Loss) Epoche für Epoche in Echtzeit.</p>
+          </div>
+          <button class="primary-btn btn-violet sm-btn" onclick="startTraining('quick_test')">🎲 Konsolen-Test</button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-wrap">
+          <div class="progress-top">
+            <span id="trainProgressLabel">Bereit für dein nächstes Experiment</span>
+            <span id="trainProgressPct" style="font-family: Consolas, monospace; color: #38bdf8;">0 %</span>
+          </div>
+          <div class="progress-track">
+            <div id="trainProgressFill" class="progress-fill"></div>
+          </div>
+        </div>
+
+        <!-- Live Learning Curve Canvas -->
+        <div class="chart-wrap">
+          <div class="chart-header">
+            <span>Lernverlauf pro Epoche</span>
+            <span>
+              <b style="color:#38bdf8;">━</b> Training % &nbsp;
+              <b style="color:#34d399;">━</b> Prüf-Genauigkeit % &nbsp;
+              <b style="color:#fbbf24;">┄</b> Fehler (Loss)
+            </span>
+          </div>
+          <canvas id="trainChartCanvas" width="540" height="155"></canvas>
+        </div>
+
+        <!-- Jump directly to live visualization when done -->
+        <div id="postTrainActionBox" class="hidden" style="margin-bottom: 12px;">
+          <button id="btnOpenTrainedBrain" class="primary-btn btn-blue" style="width: 100%; justify-content: center; padding: 11px;" onclick="openTrainedBrainInStudio()">
+            🧠 Neues Gehirn jetzt live in der Visualisierung ausprobieren →
+          </button>
+        </div>
+
+        <div id="terminalOutput" class="terminal-box">Bereit! Wähle links deine gewünschten Parameter oder eine Schnell-Vorlage und starte das Training.</div>
+      </div>
+
+    </div>
+
+    <!-- Transparent Saved Data & 1-Click Factory Reset Panel in KI-Labor -->
+    <div class="data-clean-card">
+      <div class="data-clean-info">
+        <div class="data-clean-header">
+          <span>💾 Gespeicherte Trainingsdaten &amp; Schnellstart-Ordner</span>
+          <span id="labDataPill" class="data-status-pill">Werkseinstellung (0 KB)</span>
+        </div>
+        <div id="labDataDesc" class="data-clean-desc">
+          Standard-Modelle und Datensätze sind komplett in der EXE integriert. Schnellstart-Engine und eigene Trainings werden ausschließlich im sichtbaren Ordner <b>KI_Studio_Daten</b> direkt neben der EXE abgelegt – nirgendwo sonst auf dem System.
+        </div>
+        <div id="labDataPath" class="data-path-code">Prüfe Ordner „KI_Studio_Daten“...</div>
+      </div>
+      <div class="data-clean-actions">
+        <button id="btnLabOpenData" class="ghost-btn" onclick="openDataLocation()">📂 Speicherort zeigen</button>
+        <button id="btnLabResetData" class="primary-btn btn-rose sm-btn" onclick="resetUserData()" disabled>
+          🗑️ Eigene Daten löschen &amp; Werkseinstellungen laden
+        </button>
+        <button id="btnLabCleanupAll" class="ghost-btn" onclick="cleanupAllAndExit()" disabled>
+          🧹 Schließen &amp; Datenordner entfernen
+        </button>
+      </div>
+    </div>
+  </main>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

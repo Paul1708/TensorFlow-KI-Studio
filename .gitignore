@@ -1,0 +1,32 @@
+# Python bytecode & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Packaging & distribution artifacts
+*.egg-info/
+.eggs/
+_build_tmp/
+build/
+dist/
+*.exe
+*.zip
+
+# Test, lint & type-check caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local runtime cache & custom trained models created by the app
+KI_Studio_Daten/
+
+# IDE & OS metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
