@@ -28,6 +28,23 @@ The application opens instantaneously via a zero-dependency Python standard-libr
 
 ---
 
+## Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><strong>Live Brain Visualizer (Digits 0–9)</strong></td>
+      <td align="center"><strong>AI Training &amp; Architecture Lab</strong></td>
+    </tr>
+    <tr>
+      <td><img src="docs/screenshots/brain-visualizer.png" width="440" alt="TensorFlow KI-Studio Live Brain Visualizer" /></td>
+      <td><img src="docs/screenshots/training-lab.png" width="440" alt="TensorFlow KI-Studio AI Training and Architecture Lab" /></td>
+    </tr>
+  </table>
+</div>
+
+---
+
 ## Key Features
 
 - **Handwritten Digit Recognizer (`0–9` / MNIST)**: Draw digits live with brush/eraser controls, pull random MNIST test samples, or upload `.png`/`.jpg`/`.bmp`/`.gif` files. Automatic background inversion, aspect-preserving scaling (`20x20`), and Center-of-Mass alignment normalize any input onto `28x28` pixels.
@@ -131,6 +148,7 @@ TensorFlow-KI-Studio/
 │   ├── keras.json                         # Local KERAS_HOME config (prevents ~/.keras creation)
 │   ├── mnist.npz                          # Bundled offline MNIST dataset (70,000 images)
 │   └── splash.png                         # Splash artwork for optional Windows EXE stub
+├── docs/screenshots/                      # Live UI screenshots used in README
 ├── models/
 │   ├── smiley_netz.keras                  # Pre-trained 5-class smiley CNN (~98.9% accuracy)
 │   ├── smiley_netz_meta.json              # Architecture & training curve metadata
