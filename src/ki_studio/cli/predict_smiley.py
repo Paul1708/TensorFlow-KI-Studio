@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -31,7 +31,7 @@ def load_smiley_model(paths: StudioPaths = DEFAULT_PATHS) -> tf.keras.Model:
 def predict_smiley(
     model: tf.keras.Model, image_48: np.ndarray
 ) -> tuple[int, float, float, np.ndarray]:
-    """Run inference on a `(48, 48)` smiley and return `(class_idx, conf_pct, happiness_pct, probs)`."""
+    """Evaluate a `(48, 48)` smiley and return `(class_idx, conf_pct, happiness_pct, probs)`."""
     probs = model.predict(np.expand_dims(image_48, axis=0), verbose=0)[0]
     mood_idx = int(np.argmax(probs))
     confidence = float(probs[mood_idx]) * 100.0
@@ -189,14 +189,21 @@ def launch_smiley_window(model: tf.keras.Model, paths: StudioPaths = DEFAULT_PAT
             update_meter(None, "#cbd5e0")
             for s in range(5):
                 name = f"{MOOD_NAMES[s]} {MOOD_SYMBOLS[s]}"
-                bar_labels[s].configure(text=f"{name:<18}:   0.0 %", fg="#4a5568", font=("Consolas", 9))
+                bar_labels[s].configure(
+                    text=f"{name:<18}:   0.0 %",
+                    fg="#4a5568",
+                    font=("Consolas", 9),
+                )
             return image_48
 
         idx, confidence, happiness, probs = predict_smiley(model, image_48)
         color = _mood_color(happiness)
         widgets["mood"].configure(text=f"{MOOD_NAMES[idx]}  {MOOD_SYMBOLS[idx]}", fg=color)
         widgets["happy"].configure(
-            text=f"Glücks-Level: {happiness:.1f} %   (Sicherheit: {confidence:.0f} % | {source_name})",
+            text=(
+                f"Glücks-Level: {happiness:.1f} %   "
+                f"(Sicherheit: {confidence:.0f} % | {source_name})"
+            ),
             fg=color,
         )
         update_meter(happiness, color)
@@ -207,7 +214,9 @@ def launch_smiley_window(model: tf.keras.Model, paths: StudioPaths = DEFAULT_PAT
             name = f"{MOOD_NAMES[s]} {MOOD_SYMBOLS[s]}"
             if s == idx:
                 bar_labels[s].configure(
-                    text=f"{name:<18}: {pct:5.1f} % {blocks}", fg=color, font=("Consolas", 9, "bold")
+                    text=f"{name:<18}: {pct:5.1f} % {blocks}",
+                    fg=color,
+                    font=("Consolas", 9, "bold"),
                 )
             else:
                 bar_labels[s].configure(
@@ -219,7 +228,10 @@ def launch_smiley_window(model: tf.keras.Model, paths: StudioPaths = DEFAULT_PAT
     window = InteractiveDrawingCanvas(
         title="KI Smiley-Glücks-Erkenner (TensorFlow)",
         headline="Wie glücklich ist dein Smiley?",
-        subtitle="Zeichne einen Smiley mit der Maus (mit oder ohne Kopfkreis) ODER lade eine Bilddatei:",
+        subtitle=(
+            "Zeichne einen Smiley mit der Maus (mit oder ohne Kopfkreis) "
+            "ODER lade eine Bilddatei:"
+        ),
         brush_radius=6,
         initial_dir=initial_dir,
         default_save_name="mein_smiley.png",
@@ -233,7 +245,9 @@ def main(argv: list[str] | None = None) -> None:
     configure_stdio_utf8()
     parser = argparse.ArgumentParser(
         prog="ki-studio-smiley",
-        description="Classify smiley mood (0-100% happiness) via CLI file or interactive drawing window.",
+        description=(
+            "Classify smiley mood (0-100% happiness) via CLI file or interactive drawing window."
+        ),
     )
     parser.add_argument("image", nargs="*", help="Optional path to a smiley image file.")
     args = parser.parse_args(argv)
@@ -253,7 +267,8 @@ def main(argv: list[str] | None = None) -> None:
         launch_smiley_window(model, DEFAULT_PATHS)
     except Exception as gui_err:
         print(f"(Fenster konnte nicht geöffnet werden: {gui_err})")
-        entered = input("Bitte gib den Pfad zu deinem Smiley-Bild ein (.png/.jpg): ").strip().strip('"').strip("'")
+        prompt = "Bitte gib den Pfad zu deinem Smiley-Bild ein (.png/.jpg): "
+        entered = input(prompt).strip().strip('"').strip("'")
         if entered:
             recognize_smiley_in_terminal(model, entered)
 

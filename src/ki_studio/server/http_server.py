@@ -3,15 +3,15 @@
 from __future__ import annotations
 
 import base64
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import logging
 import os
-from pathlib import Path
 import subprocess
 import sys
 import threading
 import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
@@ -115,7 +115,9 @@ class StudioRequestHandler(BaseHTTPRequestHandler):
     def log_message(self, format: str, *args: object) -> None:  # noqa: A002
         logger.debug("%s - %s", self.address_string(), format % args)
 
-    def _send_bytes(self, content: bytes, content_type: str, cache_control: str = "no-store") -> None:
+    def _send_bytes(
+        self, content: bytes, content_type: str, cache_control: str = "no-store"
+    ) -> None:
         self.send_response(200)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(content)))

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import logging
 import os
-from pathlib import Path
 import shutil
 import sys
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from ki_studio.config import ModelMode, configure_runtime_env
@@ -141,7 +141,8 @@ class StudioPaths:
                 "==============================================================\n"
                 "Die Anwendung legt KEINE versteckten Dateien auf deinem PC an.\n"
                 "Alles liegt transparent hier in diesem einzigen Ordner direkt neben der App:\n\n"
-                "  1. 'Laufzeit'       -> Schlanke App-Ressourcen (UI, Werks-Modelle & Offline-MNIST)\n"
+                "  1. 'Laufzeit'       -> Schlanke App-Ressourcen "
+                "(UI, Werks-Modelle & Offline-MNIST)\n"
                 "                         für sofortigen Start im gepackten EXE-Modus.\n"
                 "  2. 'Eigene_Modelle' -> Nur vorhanden, wenn du im KI-Labor selbst ein Netz\n"
                 "                         trainiert hast.\n\n"
@@ -184,7 +185,9 @@ class StudioPaths:
                 if legacy_file.exists() and legacy_file.is_file():
                     size = legacy_file.stat().st_size
                     custom_bytes += size
-                    custom_files.append({"name": legacy_file.name, "size_kb": round(size / 1024.0, 1)})
+                    custom_files.append(
+                        {"name": legacy_file.name, "size_kb": round(size / 1024.0, 1)}
+                    )
 
         runtime_exists = self.runtime_dir.exists() and self.runtime_dir.is_dir()
         return {
@@ -231,7 +234,9 @@ class StudioPaths:
             if self.data_dir.exists() and not self.runtime_dir.exists():
                 shutil.rmtree(self.data_dir, ignore_errors=True)
 
-            return True, "Alle eigenen Trainingsdaten wurden gelöscht. Werks-Gehirne sind wieder aktiv!"
+            return True, (
+                "Alle eigenen Trainingsdaten wurden gelöscht. Werks-Gehirne sind wieder aktiv!"
+            )
         except OSError as exc:
             return False, f"Fehler beim Löschen der eigenen Modelle: {exc}"
 
@@ -248,7 +253,10 @@ class StudioPaths:
 
             self.data_dir.mkdir(parents=True, exist_ok=True)
             self.delete_on_exit_flag.write_text("DELETE_ALL_ON_EXIT\n", encoding="utf-8")
-            return True, "App wird geschlossen und der gesamte Ordner 'KI_Studio_Daten' wird restlos entfernt."
+            return True, (
+                "App wird geschlossen und der gesamte Ordner 'KI_Studio_Daten' "
+                "wird restlos entfernt."
+            )
         except OSError as exc:
             return False, f"Fehler beim Vorbereiten der Komplettlöschung: {exc}"
 

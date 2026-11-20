@@ -5,9 +5,9 @@ from __future__ import annotations
 import base64
 import http.client
 import json
-from pathlib import Path
 import threading
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -88,7 +88,9 @@ class TestBrainEngineAndHTTPServer(unittest.TestCase):
             self.assertAlmostEqual(prob_sum, 100.0, delta=0.2)
 
         happy = self.engine.analyze_sample_file(
-            ModelMode.SMILEY, REPO_ROOT / "samples" / "smiley_gluecklich.png", "smiley_gluecklich.png"
+            ModelMode.SMILEY,
+            REPO_ROOT / "samples" / "smiley_gluecklich.png",
+            "smiley_gluecklich.png",
         )
         sad = self.engine.analyze_sample_file(
             ModelMode.SMILEY, REPO_ROOT / "samples" / "smiley_traurig.png", "smiley_traurig.png"

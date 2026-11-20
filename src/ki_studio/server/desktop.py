@@ -5,11 +5,11 @@ from __future__ import annotations
 import ctypes
 import logging
 import os
-from pathlib import Path
 import subprocess
 import threading
 import time
 import webbrowser
+from pathlib import Path
 
 from ki_studio.paths import DEFAULT_PATHS, StudioPaths
 from ki_studio.server.http_server import StudioHTTPServer
@@ -104,29 +104,34 @@ def _apply_win32_taskbar_icon(assets_dir: Path) -> None:
             return
 
         enum_proc_type = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+        matches: list[int] = []
+
+        @enum_proc_type
+        def _enum_cb(hwnd: int, _lparam: int) -> bool:
+            if user32.IsWindowVisible(hwnd):
+                length = user32.GetWindowTextLengthW(hwnd)
+                if length > 0:
+                    buf = ctypes.create_unicode_buffer(length + 1)
+                    user32.GetWindowTextW(hwnd, buf, length + 1)
+                    if _WINDOW_TITLE_FRAGMENT in buf.value:
+                        matches.append(hwnd)
+            return True
 
         for delay_sec in (0.15, 0.35, 0.7, 1.3, 2.2, 3.5):
             time.sleep(delay_sec)
-            matches: list[int] = []
-
-            @enum_proc_type
-            def _enum_cb(hwnd: int, _lparam: int) -> bool:
-                if user32.IsWindowVisible(hwnd):
-                    length = user32.GetWindowTextLengthW(hwnd)
-                    if length > 0:
-                        buf = ctypes.create_unicode_buffer(length + 1)
-                        user32.GetWindowTextW(hwnd, buf, length + 1)
-                        if _WINDOW_TITLE_FRAGMENT in buf.value:
-                            matches.append(hwnd)
-                return True
+            matches.clear()
 
             user32.EnumWindows(_enum_cb, 0)
             for hwnd in matches:
                 dummy = ctypes.c_size_t(0)
                 if h_big:
-                    user32.SendMessageTimeoutW(hwnd, wm_seticon, 1, h_big, 0x0002, 200, ctypes.byref(dummy))
+                    user32.SendMessageTimeoutW(
+                        hwnd, wm_seticon, 1, h_big, 0x0002, 200, ctypes.byref(dummy)
+                    )
                 if h_small:
-                    user32.SendMessageTimeoutW(hwnd, wm_seticon, 0, h_small, 0x0002, 200, ctypes.byref(dummy))
+                    user32.SendMessageTimeoutW(
+                        hwnd, wm_seticon, 0, h_small, 0x0002, 200, ctypes.byref(dummy)
+                    )
     except Exception as exc:
         logger.debug("Could not apply Win32 window icon: %s", exc)
 
@@ -168,17 +173,23 @@ def _load_engine_in_background(server: StudioHTTPServer) -> None:
     except ModuleNotFoundError as mod_err:
         missing = getattr(mod_err, "name", "") or str(mod_err)
         hint = (
-            f"Python-Paket '{missing}' fehlt! Bitte führe einmalig im Terminal aus:  pip install tensorflow"
+            f"Python-Paket '{missing}' fehlt! Bitte führe einmalig im Terminal aus:  "
+            "pip install tensorflow"
         )
         logger.error(hint)
         server.update_boot_status(100, hint, ready=False, error=hint)
     except Exception as exc:
         logger.exception("Failed to initialize BrainEngine")
-        server.update_boot_status(100, f"Fehler beim Laden der KI-Engine: {exc}", ready=False, error=str(exc))
+        server.update_boot_status(
+            100,
+            f"Fehler beim Laden der KI-Engine: {exc}",
+            ready=False,
+            error=str(exc),
+        )
 
 
 def _signal_ready_event() -> None:
-    """Signal the native Windows splash launcher that the local HTTP server is accepting connections."""
+    """Signal the native Windows splash launcher that the HTTP server is ready."""
     ready_evt = os.environ.get("KI_STUDIO_READY_EVENT", "").strip()
     if not ready_evt or os.name != "nt":
         return

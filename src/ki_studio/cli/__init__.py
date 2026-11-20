@@ -27,7 +27,12 @@ def build_training_parser(
 ) -> argparse.ArgumentParser:
     """Create an `ArgumentParser` populated with shared neural-network training flags."""
     parser = argparse.ArgumentParser(prog=prog, description=description)
-    parser.add_argument("--conv-layers", type=int, default=default_conv_layers, choices=[0, 1, 2, 3])
+    parser.add_argument(
+        "--conv-layers",
+        type=int,
+        default=default_conv_layers,
+        choices=[0, 1, 2, 3],
+    )
     parser.add_argument("--base-filters", type=int, default=32)
     parser.add_argument("--dense-layers", type=int, default=1, choices=[1, 2])
     parser.add_argument("--hidden-units", type=int, default=64)

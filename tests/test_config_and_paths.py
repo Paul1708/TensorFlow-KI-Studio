@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 
 from ki_studio.config import ModelMode, TrainingConfig, TrainingTask
 from ki_studio.paths import StudioPaths

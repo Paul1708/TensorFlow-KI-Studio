@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from enum import Enum
 import logging
 import os
-from pathlib import Path
 import sys
+from dataclasses import dataclass
+from enum import Enum
+from pathlib import Path
 from typing import Any, Mapping
 
 VALID_ACTIVATIONS: tuple[str, ...] = ("relu", "elu", "tanh", "sigmoid")
@@ -150,7 +150,8 @@ class TrainingConfig:
         return (
             f"{title} (Filter-Ebenen={self.conv_layers}, "
             f"Denkschichten={self.dense_layers}x{self.hidden_units} {self.activation.upper()}, "
-            f"Epochen={self.epochs}, {self.optimizer.upper()} lr={self.learning_rate:g}, {data_desc})"
+            f"Epochen={self.epochs}, {self.optimizer.upper()} lr={self.learning_rate:g}, "
+            f"{data_desc})"
         )
 
 

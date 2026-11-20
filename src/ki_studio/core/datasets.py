@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 import math
 import threading
 import time
+from collections.abc import Callable
 
 import numpy as np
 import tensorflow as tf
@@ -49,7 +49,7 @@ def compute_happiness_percent(probabilities: np.ndarray) -> float:
 def load_mnist_offline(
     paths: StudioPaths = DEFAULT_PATHS,
 ) -> tuple[tuple[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]]:
-    """Load MNIST from the bundled `assets/mnist.npz`, falling back to Keras datasets only if absent."""
+    """Load MNIST from `assets/mnist.npz`, falling back to Keras datasets if absent."""
     for candidate in (paths.assets_dir / "mnist.npz", paths.app_dir / "assets" / "mnist.npz"):
         if candidate.exists():
             with np.load(candidate) as data:
@@ -63,7 +63,10 @@ def load_digits_dataset(
     log_fn: LogFn = _noop_log,
 ) -> tuple[tuple[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]]:
     """Load and normalize MNIST images, optionally subsampling a deterministic fraction."""
-    log_fn("1. Lade integrierte Trainings- und Testbilder (MNIST-Datensatz, 100 % offline)...", False)
+    log_fn(
+        "1. Lade integrierte Trainings- und Testbilder (MNIST-Datensatz, 100 % offline)...",
+        False,
+    )
     (x_train, y_train), (x_test, y_test) = load_mnist_offline(paths)
 
     x_train = x_train.astype("float32") / 255.0
@@ -97,7 +100,7 @@ def _paint_points(canvas: np.ndarray, xs: np.ndarray, ys: np.ndarray, radius: fl
     distance = np.sqrt(dx * dx + dy * dy).astype(np.float32)
     stamp = np.clip(radius + 0.5 - distance, 0.0, 1.0)
 
-    for ix, iy in zip(ix_arr, iy_arr):
+    for ix, iy in zip(ix_arr, iy_arr, strict=True):
         y0 = max(0, iy - r_ceil)
         y1 = min(height, iy + r_ceil + 1)
         x0 = max(0, ix - r_ceil)
@@ -285,6 +288,10 @@ def generate_smiley_dataset(
             y_test[idx] = mood_class
             idx += 1
 
-    log_fn(f"   -> Fertig! Bildgröße: {SMILEY_IMAGE_SIZE}x{SMILEY_IMAGE_SIZE} Pixel, 5 Glücks-Stufen.", True)
+    log_fn(
+        f"   -> Fertig! Bildgröße: {SMILEY_IMAGE_SIZE}x{SMILEY_IMAGE_SIZE} Pixel, "
+        "5 Glücks-Stufen.",
+        True,
+    )
     log_fn("", False)
     return (x_train, y_train), (x_test, y_test)

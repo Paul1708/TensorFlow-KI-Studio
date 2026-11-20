@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 import json
 import logging
-from pathlib import Path
 import random
 import threading
+from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -92,7 +92,8 @@ class BrainEngine:
         self.train_active = False
         self.train_script = ""
         self.train_lines: list[str] = [
-            "Bereit! Passe links deine gewünschten Architektur- und Lernparameter an und klicke auf 'Training starten'."
+            "Bereit! Passe links deine gewünschten Architektur- und Lernparameter an "
+            "und klicke auf 'Training starten'."
         ]
         self.train_metrics: list[dict[str, Any]] = []
 
@@ -136,17 +137,19 @@ class BrainEngine:
         is_custom: bool = False,
     ) -> dict[str, Any]:
         """Extract layer architecture metadata directly from the model and matching JSON file."""
-        conv_layers = [l for l in model.layers if isinstance(l, tf.keras.layers.Conv2D)]
-        dense_layers = [l for l in model.layers if isinstance(l, tf.keras.layers.Dense)]
-        drop_layers = [l for l in model.layers if isinstance(l, tf.keras.layers.Dropout)]
+        conv_layers = [layer for layer in model.layers if isinstance(layer, tf.keras.layers.Conv2D)]
+        dense_layers = [layer for layer in model.layers if isinstance(layer, tf.keras.layers.Dense)]
+        drop_layers = [
+            layer for layer in model.layers if isinstance(layer, tf.keras.layers.Dropout)
+        ]
 
         hidden_layers = dense_layers[:-1] if len(dense_layers) >= 2 else []
         output_layer = dense_layers[-1] if dense_layers else None
 
-        conv_counts = [int(l.filters) for l in conv_layers]
-        conv_names = [l.name for l in conv_layers]
-        hidden_counts = [int(l.units) for l in hidden_layers]
-        hidden_names = [l.name for l in hidden_layers]
+        conv_counts = [int(layer.filters) for layer in conv_layers]
+        conv_names = [layer.name for layer in conv_layers]
+        hidden_counts = [int(layer.units) for layer in hidden_layers]
+        hidden_names = [layer.name for layer in hidden_layers]
         output_units = (
             int(output_layer.units)
             if output_layer is not None
@@ -165,7 +168,9 @@ class BrainEngine:
             "mode": mode.value,
             "is_custom": bool(is_custom),
             "source_label": (
-                "Eigenes Training (KI_Studio_Daten)" if is_custom else "Werkseinstellung (integriert)"
+                "Eigenes Training (KI_Studio_Daten)"
+                if is_custom
+                else "Werkseinstellung (integriert)"
             ),
             "arch_type": "CNN" if conv_counts else "MLP",
             "conv_layers": conv_counts,
@@ -220,7 +225,7 @@ class BrainEngine:
         return meta
 
     def get_status(self) -> dict[str, Any]:
-        """Return engine readiness, loaded model metadata, training status, and data directory info."""
+        """Return readiness, loaded model metadata, training status, and data directory info."""
         with self.lock:
             d_ready = self.digits_model is not None
             s_ready = self.smiley_model is not None
@@ -296,7 +301,9 @@ class BrainEngine:
             result["canvas_png_b64"] = encode_grayscale_png_b64(1.0 - prepared, target_size=280)
         return result
 
-    def analyze_sample_file(self, mode: ModelMode | str, file_path: Path, filename: str) -> dict[str, Any]:
+    def analyze_sample_file(
+        self, mode: ModelMode | str, file_path: Path, filename: str
+    ) -> dict[str, Any]:
         """Load an image file from disk and inspect its forward pass."""
         pixels = load_image_file(file_path)
         result = self.analyze_raw_image(mode, pixels, return_canvas_image=True)
@@ -315,7 +322,8 @@ class BrainEngine:
         labels = [str(i) for i in range(10)] if is_digits else list(MOOD_NAMES)
         symbols = [str(i) for i in range(10)] if is_digits else list(MOOD_SYMBOLS)
 
-        input_14 = tf.image.resize(image[:, :, np.newaxis], size=[14, 14], method="area").numpy()[:, :, 0]
+        resized_14 = tf.image.resize(image[:, :, np.newaxis], size=[14, 14], method="area")
+        input_14 = resized_14.numpy()[:, :, 0]
         input_grid = np.round(np.clip(input_14, 0.0, 1.0) * 100).astype(int).tolist()
 
         with self.lock:
@@ -354,9 +362,11 @@ class BrainEngine:
 
     def _run_layer_trace(self, model: tf.keras.Model, image: np.ndarray) -> dict[str, Any]:
         """Run one forward pass and collect per-layer activations, feature maps, and logits."""
-        all_dense = [l for l in model.layers if isinstance(l, tf.keras.layers.Dense)]
+        all_dense = [layer for layer in model.layers if isinstance(layer, tf.keras.layers.Dense)]
         if len(all_dense) < 2:
-            raise ValueError("Loaded model must contain at least one hidden Dense layer and one output layer.")
+            raise ValueError(
+                "Loaded model must contain at least one hidden Dense layer and one output layer."
+            )
 
         output_layer = all_dense[-1]
         x = tf.constant(image[np.newaxis, :, :], dtype=tf.float32)
@@ -380,7 +390,9 @@ class BrainEngine:
                 x = layer(x, training=False)
                 fmap = x.numpy()[0]
                 last_feature_map = fmap
-                conv_layers_out.append(self._summarize_conv_layer(layer.name, fmap, is_first=(conv_idx == 1)))
+                conv_layers_out.append(
+                    self._summarize_conv_layer(layer.name, fmap, is_first=(conv_idx == 1))
+                )
             elif isinstance(layer, tf.keras.layers.MaxPooling2D):
                 x = layer(x, training=False)
                 last_feature_map = x.numpy()[0]
@@ -405,7 +417,9 @@ class BrainEngine:
         }
 
     @staticmethod
-    def _summarize_conv_layer(layer_name: str, fmap: np.ndarray, *, is_first: bool) -> dict[str, Any]:
+    def _summarize_conv_layer(
+        layer_name: str, fmap: np.ndarray, *, is_first: bool
+    ) -> dict[str, Any]:
         fmap_mag = np.abs(fmap)
         means = np.mean(fmap_mag, axis=(0, 1))
         peaks = np.max(fmap_mag, axis=(0, 1))
@@ -454,7 +468,9 @@ class BrainEngine:
         trace: dict[str, Any],
     ) -> dict[str, Any]:
         conv_layers_out: list[dict[str, Any]] = trace["conv_layers"]
-        hidden_data: list[tuple[tf.keras.layers.Dense, np.ndarray, np.ndarray]] = trace["hidden_data"]
+        hidden_data: list[tuple[tf.keras.layers.Dense, np.ndarray, np.ndarray]] = trace[
+            "hidden_data"
+        ]
         last_feature_map: np.ndarray | None = trace["last_feature_map"]
         w_out: np.ndarray = trace["w_out"]
         b_out: np.ndarray = trace["b_out"]
@@ -495,7 +511,9 @@ class BrainEngine:
                 for j in range(act_h0.shape[0]):
                     col = flow_matrix[:, j]
                     top_c = np.argsort(np.abs(col))[-top_k:][::-1]
-                    conv_to_hidden.append([[int(c), round(float(col[c] / max_flow), 3)] for c in top_c])
+                    conv_to_hidden.append(
+                        [[int(c), round(float(col[c] / max_flow), 3)] for c in top_c]
+                    )
         elif not conv_layers_out:
             in_h, in_w = image.shape
             if in_h * in_w == w_h0.shape[0]:
@@ -622,7 +640,9 @@ class BrainEngine:
                 {
                     "name": title,
                     "layer_name": (
-                        hidden_names[idx_h] if idx_h < len(hidden_names) else f"Denkschicht_{idx_h + 1}"
+                        hidden_names[idx_h]
+                        if idx_h < len(hidden_names)
+                        else f"Denkschicht_{idx_h + 1}"
                     ),
                     "activation": act_label,
                     "count": int(h_cnt),
@@ -650,7 +670,7 @@ class BrainEngine:
                     "mini_maps": [],
                     "top_maps": [],
                 }
-                for name, cnt in zip(conv_names, conv_counts)
+                for name, cnt in zip(conv_names, conv_counts, strict=False)
             ],
             "hidden_layers": hidden_layers,
             "hidden_layer": hidden_layers[-1],
@@ -767,7 +787,8 @@ class BrainEngine:
                     with self.train_lock:
                         if target_mode is not None:
                             self.train_lines.append(
-                                "\n>>> Fertig! Neues Gehirn wurde im Ordner 'KI_Studio_Daten' gespeichert und sofort live geladen!"
+                                "\n>>> Fertig! Neues Gehirn wurde im Ordner 'KI_Studio_Daten' "
+                                "gespeichert und sofort live geladen!"
                             )
                         else:
                             self.train_lines.append("\n>>> Zufalls-Test erfolgreich abgeschlossen!")

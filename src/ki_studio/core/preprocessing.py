@@ -121,13 +121,15 @@ def _extract_and_resize_foreground(
     if max_side > min_side_for_dilation and density < max_density_for_dilation:
         kernel = max(3, int(round(max_side / dilation_divisor)))
         tensor_4d = crop[np.newaxis, :, :, np.newaxis]
-        crop = tf.nn.max_pool2d(tensor_4d, ksize=kernel, strides=1, padding="SAME").numpy()[0, :, :, 0]
+        pooled = tf.nn.max_pool2d(tensor_4d, ksize=kernel, strides=1, padding="SAME")
+        crop = pooled.numpy()[0, :, :, 0]
 
     new_h = max(1, int(round(float(inner_box) * height / max_side)))
     new_w = max(1, int(round(float(inner_box) * width / max_side)))
     method = "area" if max_side > inner_box else "bilinear"
 
-    resized = tf.image.resize(crop[:, :, np.newaxis], size=[new_h, new_w], method=method).numpy()[:, :, 0]
+    resized_t = tf.image.resize(crop[:, :, np.newaxis], size=[new_h, new_w], method=method)
+    resized = resized_t.numpy()[:, :, 0]
     max_resized = float(np.max(resized))
     if max_resized > 0.0:
         resized = np.clip(resized / max_resized, 0.0, 1.0)
@@ -140,7 +142,7 @@ def _extract_and_resize_foreground(
 
 
 def _center_by_mass(canvas: np.ndarray) -> np.ndarray:
-    """Shift foreground pixels inside a 28x28 canvas so their Center of Mass sits at (13.5, 13.5)."""
+    """Shift foreground pixels in a 28x28 canvas so their Center of Mass sits at (13.5, 13.5)."""
     size = canvas.shape[0]
     total = float(np.sum(canvas))
     if total <= 0.0:
@@ -180,7 +182,7 @@ def _center_by_mass(canvas: np.ndarray) -> np.ndarray:
 
 
 def prepare_digit_image(raw_pixels: np.ndarray) -> tuple[np.ndarray, bool]:
-    """Preprocess an arbitrary digit image into a `(28, 28)` MNIST-compatible tensor and emptiness flag."""
+    """Preprocess a digit image into a `(28, 28)` MNIST-compatible tensor and emptiness flag."""
     canvas, is_empty = _extract_and_resize_foreground(
         raw_pixels,
         canvas_size=DIGIT_CANVAS_SIZE,

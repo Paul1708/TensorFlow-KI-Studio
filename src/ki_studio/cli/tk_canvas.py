@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import base64
-from collections.abc import Callable
 import math
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -15,7 +15,7 @@ from ki_studio.core.preprocessing import load_image_file
 
 
 def array_to_tk_photo(gray_2d: np.ndarray, target_size: int) -> Any:
-    """Convert a normalized 2D grayscale array (`0..1`) into a `tk.PhotoImage` via TensorFlow PNG."""
+    """Convert a normalized 2D grayscale array (`0..1`) into a `tk.PhotoImage`."""
     import tkinter as tk
 
     resized = tf.image.resize(

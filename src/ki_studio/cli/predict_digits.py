@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -28,7 +28,7 @@ def load_digit_model(paths: StudioPaths = DEFAULT_PATHS) -> tf.keras.Model:
 
 
 def predict_digit(model: tf.keras.Model, image_28: np.ndarray) -> tuple[int, float, np.ndarray]:
-    """Run inference on a normalized `(28, 28)` image and return `(label, confidence_pct, probs)`."""
+    """Evaluate a `(28, 28)` image and return `(label, confidence_pct, probs)`."""
     probs = model.predict(np.expand_dims(image_28, axis=0), verbose=0)[0]
     predicted = int(np.argmax(probs))
     confidence = float(probs[predicted]) * 100.0
@@ -158,7 +158,10 @@ def launch_digit_window(model: tf.keras.Model, paths: StudioPaths = DEFAULT_PATH
     window = InteractiveDrawingCanvas(
         title="KI Zahlen-Erkenner (TensorFlow)",
         headline="Gib dem Neuronalen Netz ein Bild!",
-        subtitle="Wähle eine Bilddatei (.png / .jpg / .bmp) aus ODER zeichne direkt mit der Maus ins weiße Feld:",
+        subtitle=(
+            "Wähle eine Bilddatei (.png / .jpg / .bmp) aus ODER zeichne direkt "
+            "mit der Maus ins weiße Feld:"
+        ),
         brush_radius=10,
         initial_dir=initial_dir,
         default_save_name="meine_zahl.png",
@@ -172,7 +175,9 @@ def main(argv: list[str] | None = None) -> None:
     configure_stdio_utf8()
     parser = argparse.ArgumentParser(
         prog="ki-studio-digits",
-        description="Recognize handwritten digits (0-9) via CLI file or interactive drawing window.",
+        description=(
+            "Recognize handwritten digits (0-9) via CLI file or interactive drawing window."
+        ),
     )
     parser.add_argument("image", nargs="*", help="Optional path to an image file.")
     args = parser.parse_args(argv)
@@ -192,7 +197,8 @@ def main(argv: list[str] | None = None) -> None:
         launch_digit_window(model, DEFAULT_PATHS)
     except Exception as gui_err:
         print(f"(Fenster konnte nicht geöffnet werden: {gui_err})")
-        entered = input("Bitte gib den Pfad zu deiner Bilddatei ein (.png/.jpg): ").strip().strip('"').strip("'")
+        prompt = "Bitte gib den Pfad zu deiner Bilddatei ein (.png/.jpg): "
+        entered = input(prompt).strip().strip('"').strip("'")
         if entered:
             recognize_file_in_terminal(model, entered)
 

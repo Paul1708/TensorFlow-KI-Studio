@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from datetime import datetime
 import json
 import math
 import random
 import sys
 import threading
 import time
+from collections.abc import Callable
+from datetime import datetime
 from typing import Any
 
 import numpy as np
@@ -86,7 +86,8 @@ class LiveTrainingCallback(tf.keras.callbacks.Callback):
         loss = float(logs.get("loss", 0.0))
         acc = float(logs.get("accuracy", 0.0)) * 100.0
         self.log_fn(
-            f"   [{bar}] {current}/{self.steps_per_epoch} Batches • Loss: {loss:.4f} • Training: {acc:.2f} %",
+            f"   [{bar}] {current}/{self.steps_per_epoch} Batches • "
+            f"Loss: {loss:.4f} • Training: {acc:.2f} %",
             True,
         )
 
@@ -157,7 +158,10 @@ def build_classifier_model(
         f"Dropout={config.dropout * 100:.0f} %",
         False,
     )
-    log_fn(f"   -> Lehrer:      {config.optimizer.upper()} mit Lernrate {config.learning_rate:g}\n", False)
+    log_fn(
+        f"   -> Lehrer:      {config.optimizer.upper()} mit Lernrate {config.learning_rate:g}\n",
+        False,
+    )
 
     layers: list[tf.keras.layers.Layer] = [
         tf.keras.Input(
@@ -193,7 +197,9 @@ def build_classifier_model(
 
     for d_idx in range(1, config.dense_layers + 1):
         name = "Denkschicht" if config.dense_layers == 1 else f"Denkschicht_{d_idx}"
-        layers.append(tf.keras.layers.Dense(config.hidden_units, activation=config.activation, name=name))
+        layers.append(
+            tf.keras.layers.Dense(config.hidden_units, activation=config.activation, name=name)
+        )
 
     output_name = "Ausgabe_0_bis_9" if is_digits else "Gluecks_Stufen_0_bis_4"
     layers.append(tf.keras.layers.Dense(output_units, activation="softmax", name=output_name))
@@ -212,7 +218,9 @@ def build_classifier_model(
     return model
 
 
-def _log_digit_examples(model: tf.keras.Model, x_test: np.ndarray, y_test: np.ndarray, log_fn: LogFn) -> None:
+def _log_digit_examples(
+    model: tf.keras.Model, x_test: np.ndarray, y_test: np.ndarray, log_fn: LogFn
+) -> None:
     log_fn("5. Live-Test: Wir zeigen dem Netz 3 Beispielbilder aus dem Testset:", False)
     sample_indices = [0, 1, 4]
     predictions = model.predict(x_test[sample_indices], verbose=0)
@@ -231,7 +239,9 @@ def _log_digit_examples(model: tf.keras.Model, x_test: np.ndarray, y_test: np.nd
         )
 
 
-def _log_smiley_examples(model: tf.keras.Model, x_test: np.ndarray, y_test: np.ndarray, log_fn: LogFn) -> None:
+def _log_smiley_examples(
+    model: tf.keras.Model, x_test: np.ndarray, y_test: np.ndarray, log_fn: LogFn
+) -> None:
     log_fn("5. Beispiel-Tests (von Sehr traurig bis Überglücklich):", False)
     for mood_class in (0, 2, 4):
         matches = np.where(y_test == mood_class)[0]
@@ -338,7 +348,10 @@ def _run_training_pipeline(
 
     train_count = int(round(x_train.shape[0] * 0.9))
     steps_per_epoch = max(1, int(math.ceil(train_count / config.batch_size)))
-    log_fn(f"3. Starte das Training ({config.epochs} Epochen, Batch-Größe {config.batch_size})...", False)
+    log_fn(
+        f"3. Starte das Training ({config.epochs} Epochen, Batch-Größe {config.batch_size})...",
+        False,
+    )
 
     history = model.fit(
         x_train,
@@ -388,7 +401,10 @@ def _run_training_pipeline(
     )
     meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    log_fn(f"6. Fertig! Dein eigenes Netz ({meta['arch_type']}) wurde sichtbar gespeichert unter:", False)
+    log_fn(
+        f"6. Fertig! Dein eigenes Netz ({meta['arch_type']}) wurde sichtbar gespeichert unter:",
+        False,
+    )
     log_fn(f"   {model_path}", False)
     return True
 
@@ -419,7 +435,7 @@ def train_smiley_model(
     metric_fn: MetricFn | None = None,
     stop_event: threading.Event | None = None,
 ) -> bool:
-    """Train a 5-level smiley mood classifier on synthetic drawings and save it to `KI_Studio_Daten`."""
+    """Train a 5-level smiley mood classifier and save it to `KI_Studio_Daten`."""
     resolved_cfg = config or TrainingConfig.from_dict(ModelMode.SMILEY)
     return _run_training_pipeline(
         mode=ModelMode.SMILEY,
